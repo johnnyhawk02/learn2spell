@@ -6,6 +6,7 @@ Welcome to the documentation for the Vite + React + Tailwind CSS v4 starter proj
 
 - [Getting Started](./getting-started.md)
 - [Tailwind CSS v4 Guide](./tailwind-guide.md)
+- [Gemini AI Integration](./gemini-integration.md)
 
 ## Additional Resources
 

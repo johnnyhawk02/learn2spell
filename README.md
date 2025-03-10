@@ -1,17 +1,19 @@
-# Vite + React + Tailwind CSS v4 Starter
+# Vite + React + Tailwind CSS v4 + Gemini Starter
 
 ![Vite](https://img.shields.io/badge/Vite-v6.2.1-blue)
 ![React](https://img.shields.io/badge/React-v19.0.0-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0.12-blue)
 ![TypeScript](https://img.shields.io/badge/TypeScript-v5.7.2-blue)
+![Gemini AI](https://img.shields.io/badge/Gemini_AI-Integrated-green)
 
-A modern, ready-to-use starter template featuring the latest versions of Vite, React, and Tailwind CSS v4.
+A modern, ready-to-use starter template featuring the latest versions of Vite, React, Tailwind CSS v4, and Google's Gemini AI integration.
 
 ## ✨ Features
 
 - ⚡️ **Vite 6** - Super-fast development and build
 - 🔄 **React 19** - The latest React features
 - 🎨 **Tailwind CSS v4** - With proper PostCSS plugin setup
+- 🤖 **Gemini AI** - Ready-to-use Google AI integration
 - 📝 **TypeScript** - Type-safe code
 - 🧹 **ESLint** - Code quality tools
 - 🔧 **Configuration Files** - Pre-configured for immediate use
@@ -24,6 +26,7 @@ A modern, ready-to-use starter template featuring the latest versions of Vite, R
 
 - Node.js v18.0.0 or higher
 - npm v7.0.0 or higher
+- Gemini API key (for AI features)
 
 ### Installation
 
@@ -36,6 +39,15 @@ cd my-project
 2. Install dependencies:
 ```bash
 npm install
+```
+
+3. Set up environment variables:
+```bash
+# Copy the example environment file
+cp .env.example .env
+
+# Edit the .env file to add your Gemini API key
+# VITE_GEMINI_API_KEY=your_api_key_here
 ```
 
 ### Development
@@ -245,4 +257,4 @@ function App() {
 
 ---
 
-Made with ❤️ by [Your Name]
+Made with ❤️ by [johnnyhawk02](https://github.com/johnnyhawk02)
