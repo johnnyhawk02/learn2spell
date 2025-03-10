@@ -71,6 +71,7 @@ npm run preview
 │   ├── App.tsx          # Main App component
 │   ├── index.css        # CSS with Tailwind directives
 │   └── main.tsx         # Entry point
+├── docs/                # Documentation files
 ├── index.html           # HTML template
 ├── tailwind.config.js   # Tailwind configuration
 ├── postcss.config.js    # PostCSS configuration (includes @tailwindcss/postcss)
@@ -139,6 +140,108 @@ MIT License
 ## 🤝 Contributing
 
 Contributions, issues, and feature requests are welcome!
+
+## 📚 Documentation
+
+This project includes:
+
+1. **Basic documentation** in the README
+2. **Detailed guides** in the [`/docs`](./docs) directory
+3. **Component examples** in the source code
+
+For more comprehensive documentation, you can set up a documentation website:
+
+### Setting Up VitePress Documentation
+
+```bash
+# Install VitePress
+npm install -D vitepress
+
+# Create docs directory
+mkdir -p docs-site
+
+# Initialize VitePress
+npx vitepress init
+```
+
+Follow the prompts to set up your documentation site, then update your package.json:
+
+```json
+"scripts": {
+  // ... existing scripts
+  "docs:dev": "vitepress dev docs-site",
+  "docs:build": "vitepress build docs-site",
+  "docs:preview": "vitepress preview docs-site"
+}
+```
+
+Run the documentation site:
+
+```bash
+npm run docs:dev
+```
+
+### Alternative: Using Docusaurus
+
+```bash
+# Install Docusaurus
+npx create-docusaurus@latest docs-site classic
+
+# Start the documentation site
+cd docs-site
+npm start
+```
+
+## 🛠️ Extending This Starter
+
+### Adding New Dependencies
+
+```bash
+npm install package-name
+```
+
+### Adding New Pages
+
+Create new components in the `src` directory and import them in your app:
+
+```jsx
+// src/pages/About.tsx
+export default function About() {
+  return (
+    <div className="container mx-auto px-4 py-8">
+      <h1 className="text-3xl font-bold mb-4">About Page</h1>
+      <p>This is the about page content.</p>
+    </div>
+  );
+}
+```
+
+### Setting Up Routing
+
+Install React Router:
+
+```bash
+npm install react-router-dom
+```
+
+Configure routes in your `App.tsx`:
+
+```jsx
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import Home from './pages/Home';
+import About from './pages/About';
+
+function App() {
+  return (
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<Home />} />
+        <Route path="/about" element={<About />} />
+      </Routes>
+    </BrowserRouter>
+  );
+}
+```
 
 ---
 
