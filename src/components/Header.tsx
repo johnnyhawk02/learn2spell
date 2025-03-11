@@ -51,8 +51,7 @@ const Header: React.FC<HeaderProps> = ({
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between">
           <div className="mb-4 sm:mb-0">
-            <h1 className="text-3xl font-bold text-purple-600">Learn2Spell</h1>
-            <p className="text-gray-600">UK English phonics with interactive practice and audio pronunciation</p>
+            <h1 className="text-4xl font-bold text-purple-600 tracking-wide">Learn2Spell</h1>
           </div>
           
           <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4 items-center">
@@ -86,14 +85,14 @@ const Header: React.FC<HeaderProps> = ({
                 {/* Word set dropdown menu */}
                 {isMenuOpen && (
                   <div className="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-xl z-10">
-                    <ul className="py-2">
+                    <ul className="py-2 max-h-72 overflow-y-auto">
                       {wordSets.map((set) => (
                         <li key={set.id} className="px-2">
                           <div className="flex items-center justify-between hover:bg-purple-50 rounded">
                             <button
                               onClick={() => handleWordSetChange(set.id)}
-                              className={`flex-grow text-left px-2 py-2 ${
-                                set.id === currentWordSetId ? 'font-medium text-purple-700' : ''
+                              className={`flex-grow text-left px-3 py-2 ${
+                                set.id === currentWordSetId ? 'font-medium text-purple-700 bg-purple-50 rounded-md' : ''
                               }`}
                             >
                               {set.title}
@@ -103,7 +102,7 @@ const Header: React.FC<HeaderProps> = ({
                                 e.stopPropagation();
                                 onDeleteWordSet(set.id);
                               }}
-                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded"
+                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
                               title="Delete Word Set"
                             >
                               <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -142,7 +141,7 @@ const Header: React.FC<HeaderProps> = ({
             {/* Add Word Set Button (visible on larger screens) */}
             <button
               onClick={onAddNewClick}
-              className="hidden md:flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
+              className="hidden md:flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors shadow-sm"
             >
               <svg 
                 xmlns="http://www.w3.org/2000/svg" 
@@ -159,7 +158,7 @@ const Header: React.FC<HeaderProps> = ({
             {/* View Toggle Buttons */}
             <nav className="flex space-x-2">
               <button 
-                className={`px-4 py-2 rounded-lg transition-colors ${
+                className={`px-4 py-2 rounded-lg transition-colors shadow-sm font-medium ${
                   currentView === 'learn'
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
@@ -169,7 +168,7 @@ const Header: React.FC<HeaderProps> = ({
                 Learn Words
               </button>
               <button
-                className={`px-4 py-2 rounded-lg transition-colors ${
+                className={`px-4 py-2 rounded-lg transition-colors shadow-sm font-medium ${
                   currentView === 'practice'
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'

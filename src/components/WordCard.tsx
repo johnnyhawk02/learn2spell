@@ -28,8 +28,8 @@ const WordCard: React.FC<WordCardProps> = ({
     
     try {
       setIsSpeaking(true)
-      // Using Alice's voice
-      await pronounceWord(word.word, true)
+      // Using Alice's voice at normal speed
+      await pronounceWord(word.word)
     } catch (error) {
       console.error('Error pronouncing word:', error)
     } finally {

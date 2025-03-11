@@ -6,39 +6,18 @@ const hasValidApiKey = () => {
   return !!API_KEY && API_KEY.length > 0 && !API_KEY.includes('your_key_here');
 };
 
-// Voice IDs - using Alice as the default voice
-export const VOICE_IDS = {
-  alice: "Xb7hH8MSUJpSbSDYk0k2", // Alice - voice that user requested
-  dorothy: "ThT5KcBeYPX3keUQqHPh", // Dorothy - UK English female voice
-  defaultVoice: "Xb7hH8MSUJpSbSDYk0k2" // Alice is now the default voice
-};
+// Alice's voice ID - the ONLY voice we'll use
+const ALICE_VOICE_ID = "Xb7hH8MSUJpSbSDYk0k2";
 
-// Voice settings configurations
+// Voice settings configuration - ONLY normal speed
 const VOICE_SETTINGS = {
   normal: {
     stability: 0.75,
     similarity_boost: 0.75,
     style: 0,
     use_speaker_boost: true
-  },
-  slow: {
-    stability: 0.85, // Higher stability for clearer speech
-    similarity_boost: 0.65,
-    style: 0,
-    use_speaker_boost: true,
-    speed: 0.7 // Slower speed (70% of normal)
-  },
-  very_slow: {
-    stability: 0.95, // Very high stability for clearest speech
-    similarity_boost: 0.65,
-    style: 0,
-    use_speaker_boost: true,
-    speed: 0.5 // Very slow (50% of normal speed)
   }
 };
-
-// Adding export to use DEFAULT_VOICE_SETTINGS elsewhere if needed
-export const DEFAULT_VOICE_SETTINGS = VOICE_SETTINGS.slow;
 
 // Cache for audio to avoid repeated API calls for the same word
 const audioCache = new Map<string, string>();
@@ -95,16 +74,12 @@ export async function getAllVoices(): Promise<ElevenLabsVoice[]> {
 }
 
 /**
- * Generate speech for a word
+ * Generate speech for a word using Alice's voice at normal speed
  * 
  * @param word The word to generate speech for
- * @param slow Whether to use slow speech (true by default)
  * @returns Promise resolving to the URL of the audio
  */
-export async function generateSpeech(
-  word: string, 
-  slow: boolean = true
-): Promise<string> {
+export async function generateSpeech(word: string): Promise<string> {
   try {
     // Check if API key is valid
     if (!hasValidApiKey()) {
@@ -112,15 +87,13 @@ export async function generateSpeech(
     }
     
     // Check if we already have this word in cache
-    const cacheKey = `${word}-${VOICE_IDS.defaultVoice}-${slow ? 'slow' : 'normal'}`;
+    const cacheKey = `${word}-${ALICE_VOICE_ID}-normal`;
     if (audioCache.has(cacheKey)) {
       return audioCache.get(cacheKey)!;
     }
     
     // Prepare the request
-    const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_IDS.defaultVoice}`;
-    
-    const voiceSettings = slow ? VOICE_SETTINGS.slow : VOICE_SETTINGS.normal;
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${ALICE_VOICE_ID}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -132,7 +105,7 @@ export async function generateSpeech(
       body: JSON.stringify({
         text: word,
         model_id: 'eleven_monolingual_v1',
-        voice_settings: voiceSettings
+        voice_settings: VOICE_SETTINGS.normal
       })
     });
     
@@ -156,17 +129,13 @@ export async function generateSpeech(
 }
 
 /**
- * Play audio for a word
+ * Play audio for a word using Alice's voice at normal speed
  * 
  * @param word The word to pronounce
- * @param slow Whether to use slow speech (true by default)
  */
-export async function pronounceWord(
-  word: string, 
-  slow: boolean = true
-): Promise<void> {
+export async function pronounceWord(word: string): Promise<void> {
   try {
-    const audioUrl = await generateSpeech(word, slow);
+    const audioUrl = await generateSpeech(word);
     const audio = new Audio(audioUrl);
     await audio.play();
   } catch (error) {
@@ -176,23 +145,13 @@ export async function pronounceWord(
 }
 
 /**
- * Get available voice options (simplified to only Dorothy)
- * 
- * @returns Object containing voice IDs
- */
-export function getVoiceOptions() {
-  return VOICE_IDS;
-}
-
-/**
  * Pronounce a phonetic breakdown with pauses between each sound
+ * Using Alice's voice at normal speed with added pauses
  * 
  * @param phoneticBreakdown The phonetic breakdown to pronounce
  * @returns Promise that resolves when audio finishes
  */
-export async function pronouncePhoneticBreakdown(
-  phoneticBreakdown: string
-): Promise<void> {
+export async function pronouncePhoneticBreakdown(phoneticBreakdown: string): Promise<void> {
   try {
     if (!hasValidApiKey()) {
       throw new Error("No ElevenLabs API key provided. Set VITE_ELEVENLABS_API_KEY in your .env file.");
@@ -204,10 +163,8 @@ export async function pronouncePhoneticBreakdown(
       throw new Error('No phonetic breakdown provided');
     }
     
-    console.log('Pronouncing phonetic breakdown:', phoneticBreakdown);
-    
     // Format the phonetic breakdown for clearer pronunciation
-    // Add more space and periods to force slower, more deliberate speech
+    // Add more space and periods to force deliberate speech
     let formattedBreakdown = phoneticBreakdown
       .replace(/-/g, '. ') // Replace hyphens with period and space
       .replace(/\s+/g, '. '); // Replace spaces with period and space
@@ -215,10 +172,8 @@ export async function pronouncePhoneticBreakdown(
     // Add more deliberate pauses between sounds
     formattedBreakdown = formattedBreakdown + '.';
     
-    console.log('Formatted for pronunciation:', formattedBreakdown);
-    
-    // Use the default voice (Alice) with very slow voice settings
-    const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_IDS.defaultVoice}`;
+    // Use Alice's voice at normal speed with the formatted text
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${ALICE_VOICE_ID}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -230,7 +185,7 @@ export async function pronouncePhoneticBreakdown(
       body: JSON.stringify({
         text: formattedBreakdown,
         model_id: 'eleven_monolingual_v1',
-        voice_settings: VOICE_SETTINGS.very_slow
+        voice_settings: VOICE_SETTINGS.normal
       })
     });
     
@@ -253,13 +208,12 @@ export async function pronouncePhoneticBreakdown(
 
 /**
  * Pronounce a word letter-by-letter with pauses between each letter
+ * Using Alice's voice at normal speed with added pauses
  * 
  * @param word The word to pronounce letter-by-letter
  * @returns Promise that resolves when audio finishes
  */
-export async function pronounceLetterByLetter(
-  word: string
-): Promise<void> {
+export async function pronounceLetterByLetter(word: string): Promise<void> {
   try {
     if (!hasValidApiKey()) {
       throw new Error("No ElevenLabs API key provided. Set VITE_ELEVENLABS_API_KEY in your .env file.");
@@ -271,17 +225,13 @@ export async function pronounceLetterByLetter(
       throw new Error('No word provided');
     }
     
-    console.log('Pronouncing word letter-by-letter:', word);
-    
     // Simple approach: just add spaces and pauses between each letter
     const letters = word.split('');
     // Add space and pause after each letter
     const simpleSpellOut = letters.join(' . ');
     
-    console.log('Formatted for letter-by-letter pronunciation:', simpleSpellOut);
-    
-    // Use the very slow voice settings for clearest pronunciation
-    const url = `https://api.elevenlabs.io/v1/text-to-speech/${VOICE_IDS.defaultVoice}`;
+    // Use Alice's voice at normal speed with the formatted text
+    const url = `https://api.elevenlabs.io/v1/text-to-speech/${ALICE_VOICE_ID}`;
     
     const response = await fetch(url, {
       method: 'POST',
@@ -293,7 +243,7 @@ export async function pronounceLetterByLetter(
       body: JSON.stringify({
         text: simpleSpellOut,
         model_id: 'eleven_monolingual_v1',
-        voice_settings: VOICE_SETTINGS.very_slow // Use very_slow for clearer letter sounds
+        voice_settings: VOICE_SETTINGS.normal
       })
     });
     
