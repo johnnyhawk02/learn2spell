@@ -28,7 +28,7 @@ const safetySettings = [
 ];
 
 /**
- * Generate text using Gemini 2.0 Flash model
+ * Generate text using Gemini Pro model
  * @param prompt The text prompt to send to Gemini
  * @returns The generated text response
  */
@@ -38,8 +38,8 @@ export async function generateText(prompt: string): Promise<string> {
       throw new Error('Gemini API key is missing. Please add VITE_GEMINI_API_KEY to your environment variables.');
     }
 
-    // For text-only input, use the gemini-2.0-flash model (updated from gemini-pro)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    // For text-only input, use the gemini-pro model
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     
     const result = await model.generateContent({
       contents: [{ role: 'user', parts: [{ text: prompt }] }],
@@ -61,7 +61,7 @@ export async function generateText(prompt: string): Promise<string> {
 }
 
 /**
- * Generate text with image input using Gemini 2.0 Pro Vision model
+ * Generate text with image input using Gemini Pro Vision model
  * @param prompt The text prompt to send to Gemini
  * @param imageUrl The URL of the image to analyze
  * @returns The generated text response
@@ -72,8 +72,8 @@ export async function generateTextFromImage(prompt: string, imageData: string): 
       throw new Error('Gemini API key is missing. Please add VITE_GEMINI_API_KEY to your environment variables.');
     }
 
-    // For multimodal input (text + image), use the gemini-2.0-pro-vision model (updated from gemini-pro-vision)
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-pro-vision' });
+    // For multimodal input (text + image), use the gemini-pro-vision model
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro-vision' });
     
     const result = await model.generateContent({
       contents: [
@@ -112,8 +112,8 @@ export function createChatSession() {
       throw new Error('Gemini API key is missing. Please add VITE_GEMINI_API_KEY to your environment variables.');
     }
 
-    // Updated from gemini-pro to gemini-2.0-flash for chat
-    const model = genAI.getGenerativeModel({ model: 'gemini-2.0-flash' });
+    // Using gemini-pro for chat sessions
+    const model = genAI.getGenerativeModel({ model: 'gemini-pro' });
     return model.startChat({
       safetySettings,
       generationConfig: {
@@ -165,6 +165,38 @@ export async function rawGeminiApiCall(
     return await response.json();
   } catch (error) {
     console.error('Error making raw Gemini API call:', error);
+    throw error;
+  }
+}
+
+/**
+ * List all available Gemini models
+ * This is useful for debugging and finding the correct model names
+ * @returns A promise that resolves to a list of available models
+ */
+export async function listGeminiModels(): Promise<any> {
+  try {
+    if (!API_KEY) {
+      throw new Error('Gemini API key is missing. Please add VITE_GEMINI_API_KEY to your environment variables.');
+    }
+
+    const url = `https://generativelanguage.googleapis.com/v1beta/models?key=${API_KEY}`;
+    
+    const response = await fetch(url, {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json',
+      }
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      throw new Error(`Gemini API Error: ${errorData.error?.message || response.statusText}`);
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error('Error listing Gemini models:', error);
     throw error;
   }
 } 

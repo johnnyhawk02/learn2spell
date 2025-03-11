@@ -6,7 +6,7 @@ export default function GeminiRawApi() {
   const [result, setResult] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [modelType, setModelType] = useState('gemini-2.0-flash');
+  const [modelType, setModelType] = useState('gemini-pro');
   const [rawResponse, setRawResponse] = useState<Record<string, any> | null>(null);
   const [showRaw, setShowRaw] = useState(false);
 
@@ -54,9 +54,8 @@ export default function GeminiRawApi() {
             onChange={(e) => setModelType(e.target.value)}
             className="w-full p-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-indigo-500"
           >
-            <option value="gemini-2.0-flash">gemini-2.0-flash (Fast)</option>
-            <option value="gemini-2.0-pro">gemini-2.0-pro (Advanced)</option>
-            <option value="gemini-2.0-pro-vision">gemini-2.0-pro-vision (Vision)</option>
+            <option value="gemini-pro">gemini-pro (Standard)</option>
+            <option value="gemini-pro-vision">gemini-pro-vision (Vision)</option>
           </select>
         </div>
         

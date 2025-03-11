@@ -1,6 +1,6 @@
 # Google Gemini AI Integration
 
-This starter includes built-in integration with Google's Generative AI (Gemini 2.0) models, allowing you to easily add AI capabilities to your application.
+This starter includes built-in integration with Google's Generative AI (Gemini) models, allowing you to easily add AI capabilities to your application.
 
 ## Setup
 
@@ -115,7 +115,7 @@ const handleGenerateWithRawApi = async () => {
       }]
     };
     
-    const response = await rawGeminiApiCall('generateContent', 'gemini-2.0-flash', payload);
+    const response = await rawGeminiApiCall('generateContent', 'gemini-pro', payload);
     
     // Process the raw response
     const generatedText = response.candidates?.[0]?.content?.parts?.[0]?.text;
@@ -142,7 +142,7 @@ While this starter provides a JavaScript SDK integration, you can also make dire
 ### Basic Text Generation with cURL
 
 ```bash
-curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY" \
+curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=YOUR_API_KEY" \
 -H 'Content-Type: application/json' \
 -X POST \
 -d '{
@@ -155,7 +155,7 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:g
 ### Chat API with cURL
 
 ```bash
-curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=YOUR_API_KEY" \
+curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro:generateContent?key=YOUR_API_KEY" \
 -H 'Content-Type: application/json' \
 -X POST \
 -d '{
@@ -179,7 +179,7 @@ curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:g
 ### Image Analysis with cURL
 
 ```bash
-curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-pro-vision:generateContent?key=YOUR_API_KEY" \
+curl "https://generativelanguage.googleapis.com/v1beta/models/gemini-pro-vision:generateContent?key=YOUR_API_KEY" \
 -H 'Content-Type: application/json' \
 -X POST \
 -d '{
