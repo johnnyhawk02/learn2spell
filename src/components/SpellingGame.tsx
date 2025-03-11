@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react'
-import { pronounceWord } from '../utils/elevenLabsService'
+import { pronounceWord, pronounceSpelling } from '../utils/elevenLabsService'
 import AlphaKeyboard from './AlphaKeyboard'
 
 type Word = {
@@ -97,13 +97,28 @@ const SpellingGame: React.FC<SpellingGameProps> = ({
       const currentWord = words[currentWordIndex].word
       
       if (isCorrect) {
-        // Shorter positive messages
+        // 20 different congratulatory messages for Chloe
         const messages = [
           `Well done, Chloe!`,
           `Great job, Chloe!`,
           `Perfect, Chloe!`,
           `Excellent, Chloe!`,
-          `That's right, Chloe!`
+          `That's right, Chloe!`,
+          `Amazing spelling, Chloe!`,
+          `Wonderful job, Chloe!`,
+          `You're doing great, Chloe!`,
+          `Fantastic spelling, Chloe!`,
+          `Brilliant work, Chloe!`,
+          `Super job, Chloe!`,
+          `You're a spelling star, Chloe!`,
+          `Magnificent, Chloe!`,
+          `Spectacular spelling, Chloe!`,
+          `You've got it, Chloe!`,
+          `You're so clever, Chloe!`,
+          `Terrific job, Chloe!`,
+          `You're getting so good at this, Chloe!`,
+          `Keep up the great work, Chloe!`,
+          `You're making wonderful progress, Chloe!`
         ]
         const message = messages[Math.floor(Math.random() * messages.length)]
         // Simply call pronounceWord which will use Alice's voice
@@ -114,17 +129,30 @@ const SpellingGame: React.FC<SpellingGameProps> = ({
           moveToNextWord()
         }, 1500)
       } else {
-        // Shorter encouraging messages for incorrect answers
+        // Variety of encouraging messages for incorrect answers
         const messages = [
-          `Try again Chloe, it's ${currentWord}.`,
-          `It's spelled ${currentWord}, Chloe.`,
-          `The word is ${currentWord}, Chloe.`,
-          `Almost, Chloe. It's ${currentWord}.`,
-          `Keep trying, Chloe.`
+          `Try again Chloe`,
+          `Not quite Chloe`,
+          `Almost Chloe`,
+          `Keep trying Chloe`,
+          `Don't worry Chloe`,
+          `That was a tricky one Chloe`,
+          `Nice effort Chloe`,
+          `Let's try another one Chloe`,
+          `You'll get it next time Chloe`,
+          `Let me help you Chloe`
         ]
+        
+        // Use two separate pronounceWord calls - first for the feedback message,
+        // then for the correct spelling after a short pause
         const message = messages[Math.floor(Math.random() * messages.length)]
-        // Simply call pronounceWord which will use Alice's voice
         await pronounceWord(message)
+        
+        // Add a small pause before saying the correct word
+        await new Promise(resolve => setTimeout(resolve, 300))
+        
+        // Now pronounce the correct spelling using the dedicated function
+        await pronounceSpelling(currentWord)
       }
     } catch (error) {
       console.error('Error with voice feedback:', error)
