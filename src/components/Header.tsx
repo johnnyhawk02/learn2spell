@@ -14,21 +14,21 @@ type WordSet = {
 
 type HeaderProps = {
   currentView: 'learn' | 'practice'
-  setCurrentView: (view: 'learn' | 'practice') => void
+  onViewChange: (view: 'learn' | 'practice') => void
   wordSets: WordSet[]
   currentWordSetId: string
-  setCurrentWordSetId: (id: string) => void
-  onAddWordSetClick: () => void
+  onWordSetChange: (id: string) => void
+  onAddNewClick: () => void
   onDeleteWordSet: (id: string) => void
 }
 
 const Header: React.FC<HeaderProps> = ({ 
   currentView, 
-  setCurrentView, 
+  onViewChange, 
   wordSets, 
   currentWordSetId, 
-  setCurrentWordSetId,
-  onAddWordSetClick,
+  onWordSetChange,
+  onAddNewClick,
   onDeleteWordSet
 }) => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -38,7 +38,7 @@ const Header: React.FC<HeaderProps> = ({
   };
 
   const handleWordSetChange = (id: string) => {
-    setCurrentWordSetId(id);
+    onWordSetChange(id);
     setIsMenuOpen(false);
   };
 
@@ -117,7 +117,7 @@ const Header: React.FC<HeaderProps> = ({
                         <button
                           onClick={() => {
                             setIsMenuOpen(false);
-                            onAddWordSetClick();
+                            onAddNewClick();
                           }}
                           className="w-full text-left px-4 py-2 text-green-600 hover:bg-green-50 font-medium flex items-center"
                         >
@@ -141,7 +141,7 @@ const Header: React.FC<HeaderProps> = ({
             
             {/* Add Word Set Button (visible on larger screens) */}
             <button
-              onClick={onAddWordSetClick}
+              onClick={onAddNewClick}
               className="hidden md:flex items-center space-x-1 bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
             >
               <svg 
@@ -164,7 +164,7 @@ const Header: React.FC<HeaderProps> = ({
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
-                onClick={() => setCurrentView('learn')}
+                onClick={() => onViewChange('learn')}
               >
                 Learn Words
               </button>
@@ -174,7 +174,7 @@ const Header: React.FC<HeaderProps> = ({
                     ? 'bg-purple-600 text-white'
                     : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                 }`}
-                onClick={() => setCurrentView('practice')}
+                onClick={() => onViewChange('practice')}
               >
                 Practice Spelling
               </button>

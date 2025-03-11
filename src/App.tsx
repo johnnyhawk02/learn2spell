@@ -208,48 +208,51 @@ function App() {
     }
   };
 
+  const handleWordSetChange = (id: string) => {
+    setCurrentWordSetId(id);
+  };
+
   return (
-    <div className="min-h-screen bg-gradient-to-b from-blue-50 to-purple-50">
+    <div className="min-h-screen bg-gray-50">
       <Header 
-        setCurrentView={setCurrentView} 
         currentView={currentView}
+        onViewChange={setCurrentView}
         wordSets={Object.values(wordSets)}
         currentWordSetId={currentWordSetId}
-        setCurrentWordSetId={setCurrentWordSetId}
-        onAddWordSetClick={() => setIsAddDialogOpen(true)}
+        onWordSetChange={handleWordSetChange}
+        onAddNewClick={() => setIsAddDialogOpen(true)}
         onDeleteWordSet={handleDeleteWordSet}
       />
       
-      <main className="container mx-auto px-4 py-8">
-        {hasWordSets && currentWordSet ? (
-          <>
-            {currentView === 'learn' ? (
-              <WordList words={currentWordSet.words} />
-            ) : (
-              <SpellingGame words={currentWordSet.words} />
-            )}
-          </>
-        ) : (
-          // Empty state
-          <div className="flex flex-col items-center justify-center h-64 mt-8">
-            <button
-              onClick={() => setIsAddDialogOpen(true)}
-              className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center"
-            >
-              <svg 
-                xmlns="http://www.w3.org/2000/svg" 
-                className="h-5 w-5 mr-2" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor"
+      {/* Conditionally render main container based on view */}
+      {currentView === 'practice' && hasWordSets && currentWordSet ? (
+        <SpellingGame words={currentWordSet.words} />
+      ) : (
+        <main className="container mx-auto px-4 py-8">
+          {hasWordSets && currentWordSet ? (
+            <WordList words={currentWordSet.words} />
+          ) : (
+            // Empty state
+            <div className="flex flex-col items-center justify-center h-64 mt-8">
+              <button
+                onClick={() => setIsAddDialogOpen(true)}
+                className="bg-purple-600 hover:bg-purple-700 text-white px-6 py-3 rounded-lg transition-colors flex items-center"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              Add Words
-            </button>
-          </div>
-        )}
-      </main>
+                <svg 
+                  xmlns="http://www.w3.org/2000/svg" 
+                  className="h-5 w-5 mr-2" 
+                  fill="none" 
+                  viewBox="0 0 24 24" 
+                  stroke="currentColor"
+                >
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                Add Words
+              </button>
+            </div>
+          )}
+        </main>
+      )}
       
       {/* Add Word Set Dialog */}
       <AddWordSetDialog 

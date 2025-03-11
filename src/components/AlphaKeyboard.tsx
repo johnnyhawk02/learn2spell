@@ -21,12 +21,12 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
   }
 
   return (
-    <div className="mt-3 mb-1 select-none">
+    <div className="w-full select-none">
       {/* Render each row of keys */}
       {keyboardRows.map((row, rowIndex) => (
         <div 
           key={`row-${rowIndex}`}
-          className={`flex justify-center mb-1 ${rowIndex === 1 ? 'ml-2' : rowIndex === 2 ? 'ml-6' : ''}`}
+          className={`flex justify-center mb-1 ${rowIndex === 1 ? 'ml-[2%]' : rowIndex === 2 ? 'ml-[5%]' : ''}`}
         >
           {row.map(key => (
             <button
@@ -35,17 +35,15 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
               onClick={() => handleKeyPress(key)}
               disabled={disabled}
               className={`
-                w-8 h-8 mx-[2px] rounded-md font-medium text-base
+                flex-1 aspect-square max-w-[9%] m-[0.25%] rounded-md font-medium text-base
+                flex items-center justify-center
                 focus:outline-none focus:ring-1 focus:ring-purple-500
                 transition-colors duration-150
                 ${disabled
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
                   : 'bg-white border border-purple-300 text-purple-800 hover:bg-purple-100 active:bg-purple-200'
                 }
-                sm:w-9 sm:h-9 sm:mx-1
-                md:w-10 md:h-10
-                lg:w-11 lg:h-11
-                xl:text-lg
+                md:text-lg
               `}
               aria-label={key}
             >
@@ -55,22 +53,23 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
         </div>
       ))}
       
-      {/* Add a spacebar and backspace row */}
+      {/* Add spacebar and backspace row */}
       <div className="flex justify-center mb-1">
         <button
           type="button"
           onClick={() => handleKeyPress('Backspace')}
           disabled={disabled}
           className={`
-            w-14 mx-1 rounded-md font-medium text-sm h-8
+            w-[20%] mx-[0.5%] rounded-md font-medium text-sm h-10
+            flex items-center justify-center
             focus:outline-none focus:ring-1 focus:ring-purple-500
             transition-colors duration-150
             ${disabled
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-white border border-purple-300 text-purple-800 hover:bg-purple-100 active:bg-purple-200'
             }
-            sm:w-16 sm:h-9
-            md:w-20 md:h-10
+            sm:h-11
+            md:h-12
           `}
           aria-label="backspace"
         >
@@ -82,15 +81,16 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
           onClick={() => handleKeyPress(' ')}
           disabled={disabled}
           className={`
-            w-24 mx-1 rounded-md font-medium text-sm h-8
+            w-[40%] mx-[0.5%] rounded-md font-medium text-sm h-10
+            flex items-center justify-center
             focus:outline-none focus:ring-1 focus:ring-purple-500
             transition-colors duration-150
             ${disabled
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-white border border-purple-300 text-purple-800 hover:bg-purple-100 active:bg-purple-200'
             }
-            sm:w-28 sm:h-9
-            md:w-36 md:h-10
+            sm:h-11
+            md:h-12
           `}
           aria-label="space"
         >

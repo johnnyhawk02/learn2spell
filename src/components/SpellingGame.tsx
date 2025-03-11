@@ -114,9 +114,9 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
   }
   
   return (
-    <div className="p-2 sm:p-3 md:p-4 bg-white rounded-lg shadow-lg mx-auto max-w-lg md:max-w-2xl">
+    <div className="h-[100vh] w-full flex flex-col bg-white">
       {gameCompleted ? (
-        <div className="text-center py-4 md:py-6">
+        <div className="flex-1 flex flex-col items-center justify-center p-4">
           <h2 className="text-2xl md:text-3xl font-bold text-purple-800 mb-3">Game Completed!</h2>
           <p className="text-lg md:text-xl mb-4">Your final score: <span className="font-bold text-purple-600">{score}</span></p>
           <button
@@ -127,8 +127,9 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
           </button>
         </div>
       ) : (
-        <>
-          <div className="flex justify-between items-center mb-2">
+        <div className="flex flex-col h-full">
+          {/* Header area with score */}
+          <div className="flex justify-between items-center p-2 border-b border-gray-200 bg-white z-10">
             <p className="text-sm md:text-base text-gray-600">
               Word {currentWordIndex + 1}/{words.length}
             </p>
@@ -137,8 +138,10 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
             </div>
           </div>
           
-          <div className="mb-3 text-center">
-            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1">Spell the Word</h2>
+          {/* Main content area - set max height to ensure it doesn't overflow */}
+          <div className="flex-1 overflow-y-auto p-2 md:p-4" style={{ maxHeight: 'calc(100vh - 150px)' }}>
+            <h2 className="text-lg md:text-xl font-bold text-gray-800 mb-1 text-center">Spell the Word</h2>
+            
             <div className="bg-purple-100 rounded-lg p-2 mb-2">
               <p className="text-sm md:text-base text-gray-700">Definition:</p>
               <p className="text-base md:text-lg italic">{currentWord.definition}</p>
@@ -186,27 +189,25 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
                 {slowSpeed ? "Slow" : "Normal"}
               </button>
             </div>
-          </div>
-          
-          {gameState === 'correct' && (
-            <div className="bg-green-100 border border-green-300 text-green-700 px-3 py-2 rounded-md mb-2 flex items-center text-sm">
-              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-              </svg>
-              <span>Correct! Good job!</span>
-            </div>
-          )}
-          
-          {gameState === 'incorrect' && (
-            <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-md mb-2 flex items-center text-sm">
-              <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-              <span>Not quite right. Try again!</span>
-            </div>
-          )}
-          
-          <div className="mb-2">
+            
+            {gameState === 'correct' && (
+              <div className="bg-green-100 border border-green-300 text-green-700 px-3 py-2 rounded-md mb-2 flex items-center text-sm">
+                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+                <span>Correct! Good job!</span>
+              </div>
+            )}
+            
+            {gameState === 'incorrect' && (
+              <div className="bg-red-100 border border-red-300 text-red-700 px-3 py-2 rounded-md mb-2 flex items-center text-sm">
+                <svg className="h-4 w-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <span>Not quite right. Try again!</span>
+              </div>
+            )}
+            
             <div className="flex justify-center space-x-1 mb-2">
               {currentWord.word.split('').map((letter, index) => (
                 <span 
@@ -224,7 +225,7 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
               ))}
             </div>
             
-            <form onSubmit={handleSubmit}>
+            <form onSubmit={handleSubmit} className="flex flex-col">
               <div className="mb-2">
                 <input
                   type="text"
@@ -241,14 +242,8 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
                   onBlur={() => setInputFocused(false)}
                 />
               </div>
-
-              {/* Add the virtual keyboard */}
-              <AlphaKeyboard 
-                onKeyPress={handleKeyPress} 
-                disabled={gameState !== 'playing'}
-              />
               
-              <div className="flex justify-between mt-2">
+              <div className="flex justify-between mt-2 mb-1">
                 <button
                   type="button"
                   onClick={revealHint}
@@ -281,16 +276,23 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
                   </button>
                 )}
               </div>
+              
+              <div className="bg-purple-50 rounded-lg p-2 text-center text-xs md:text-sm mb-2">
+                <p className="text-purple-800">
+                  Remember: In these words, the letter 'y' makes the short 'i' sound (/I/).
+                </p>
+              </div>
             </form>
           </div>
           
-          <div className="bg-purple-50 rounded-lg p-2 text-center text-xs md:text-sm">
-            <p className="text-purple-800">
-              Remember: In these words, the letter 'y' makes the short 'i' sound (/I/), 
-              typically in the middle of words.
-            </p>
+          {/* Keyboard area - fixed at bottom with specific height */}
+          <div className="p-1 bg-gray-50 border-t border-gray-200 z-10" style={{ minHeight: '130px' }}>
+            <AlphaKeyboard 
+              onKeyPress={handleKeyPress} 
+              disabled={gameState !== 'playing'}
+            />
           </div>
-        </>
+        </div>
       )}
     </div>
   )
