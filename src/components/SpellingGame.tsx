@@ -22,6 +22,7 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
   const [gameCompleted, setGameCompleted] = useState(false)
   const [isAnimating, setIsAnimating] = useState(false)
   const [confetti, setConfetti] = useState(false)
+  const [nextWordCountdown, setNextWordCountdown] = useState<number | null>(null)
 
   // Reset hints when moving to a new word
   useEffect(() => {
@@ -33,6 +34,21 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
       pronounceWord(words[currentWordIndex].word)
     }
   }, [currentWordIndex, words])
+
+  // Countdown timer effect
+  useEffect(() => {
+    if (nextWordCountdown !== null && nextWordCountdown > 0) {
+      const timer = setTimeout(() => {
+        setNextWordCountdown(nextWordCountdown - 1)
+      }, 1000)
+      
+      return () => clearTimeout(timer)
+    }
+    
+    if (nextWordCountdown === 0) {
+      setNextWordCountdown(null)
+    }
+  }, [nextWordCountdown])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (gameState === 'playing') {
@@ -76,6 +92,14 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
     } else {
       playErrorSound()
       setGameState('incorrect')
+      
+      // Start countdown for 2 seconds
+      setNextWordCountdown(2)
+      
+      // Automatically move to the next word after showing the incorrect answer message
+      setTimeout(() => {
+        moveToNextWord()
+      }, 2500) // 2.5 seconds delay before moving to next word when incorrect
     }
 
     setIsAnimating(true)
@@ -356,7 +380,17 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
               `}>
                 {gameState === 'correct' 
                   ? '🎉 Correct! Great job!' 
-                  : `💫 Not quite. The word is "${currentWord.word}"`}
+                  : (
+                    <div className="flex items-center justify-center">
+                      <span>💫 Not quite. The word is "{currentWord.word}"</span>
+                      {nextWordCountdown !== null && (
+                        <span className="ml-2 px-2 py-0.5 bg-white rounded-full text-sm">
+                          Next word in {nextWordCountdown}...
+                        </span>
+                      )}
+                    </div>
+                  )
+                }
               </div>
             ) : null}
           </div>
