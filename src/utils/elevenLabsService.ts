@@ -37,8 +37,8 @@ const VOICE_SETTINGS = {
   }
 };
 
-// Default to slow speech
-const DEFAULT_VOICE_SETTINGS = VOICE_SETTINGS.slow;
+// Adding export to use DEFAULT_VOICE_SETTINGS elsewhere if needed
+export const DEFAULT_VOICE_SETTINGS = VOICE_SETTINGS.slow;
 
 // Cache for audio to avoid repeated API calls for the same word
 const audioCache = new Map<string, string>();

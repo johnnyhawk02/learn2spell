@@ -30,16 +30,6 @@ const AddWordSetDialog: React.FC<AddWordSetDialogProps> = ({ isOpen, onClose, on
   const [isGenerating, setIsGenerating] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   
-  // Function to get formatted date for the word set name
-  const getFormattedDate = () => {
-    const now = new Date()
-    return now.toLocaleDateString('en-US', { 
-      month: 'short', 
-      day: 'numeric', 
-      year: 'numeric' 
-    })
-  }
-  
   // Function to handle word list generation
   const handleGenerate = async () => {
     try {

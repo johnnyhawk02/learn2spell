@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { getAllVoices, ElevenLabsVoice, setDefaultVoice, pronounceWord } from '../utils/elevenLabsService';
+import { getAllVoices, ElevenLabsVoice, pronounceWord } from '../utils/elevenLabsService';
 
 type VoiceFinderDialogProps = {
   isOpen: boolean;
@@ -94,7 +94,7 @@ const VoiceFinderDialog: React.FC<VoiceFinderDialogProps> = ({ isOpen, onClose, 
         await audio.play();
       } else {
         // Otherwise use our TTS function
-        await pronounceWord("This is a sample of my voice. I can help children learn to spell.", voice.voice_id, true);
+        await pronounceWord(voice.name, true);
         setCurrentPreviewId(null);
       }
     } catch (error) {
@@ -106,7 +106,6 @@ const VoiceFinderDialog: React.FC<VoiceFinderDialogProps> = ({ isOpen, onClose, 
   // Handle voice selection
   const handleSelectVoice = (voiceId: string) => {
     setSelectedVoiceId(voiceId);
-    setDefaultVoice(voiceId);
     onVoiceSelect(voiceId);
   };
 

@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import SpellingGame from './components/SpellingGame.tsx'
 import WordList from './components/WordList.tsx'
 import Header from './components/Header.tsx'
@@ -134,9 +134,6 @@ function App() {
   
   // State for dialog visibility - only show automatically if no custom word sets
   const [isAddDialogOpen, setIsAddDialogOpen] = useState(false);
-  
-  // Empty state message
-  const [emptyStateMessage, setEmptyStateMessage] = useState<string>('Add your first word set to get started!');
   
   // Check if we have any word sets
   const hasWordSets = Object.keys(wordSets).length > 0;

@@ -1,5 +1,5 @@
 import { useState, useEffect, useRef, FormEvent } from 'react';
-import { generateText, createChatSession } from '../utils/gemini';
+import { generateText } from '../utils/gemini';
 
 interface Message {
   role: 'user' | 'model';
