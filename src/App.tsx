@@ -21,8 +21,8 @@ type WordSet = {
 
 // Default word set with words containing the /I/ sound spelled with 'y'
 const DEFAULT_WORD_SET: WordSet = {
-  id: uuidv4(),
-  title: "Words with 'y' as /I/ Sound",
+  id: "default-wordset-id", // Using a fixed ID for the default set
+  title: "oxygen,lyric,system",
   description: "Learn to spell words where the letter 'y' makes the /I/ sound",
   words: [
     {
@@ -103,11 +103,14 @@ function App() {
   const [wordSets, setWordSets] = useState<Record<string, WordSet>>(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      const parsedSets = saved ? JSON.parse(saved) : {};
+      let parsedSets = saved ? JSON.parse(saved) : {};
       
-      // If no saved word sets, initialize with the default set
-      if (Object.keys(parsedSets).length === 0) {
-        return { [DEFAULT_WORD_SET.id]: DEFAULT_WORD_SET };
+      // Always ensure the default set is included
+      if (!parsedSets[DEFAULT_WORD_SET.id]) {
+        parsedSets = {
+          ...parsedSets,
+          [DEFAULT_WORD_SET.id]: DEFAULT_WORD_SET
+        };
       }
       
       return parsedSets;
@@ -189,6 +192,12 @@ function App() {
 
   // Handler to delete a word set
   const handleDeleteWordSet = (id: string) => {
+    // Prevent deletion of the default word set
+    if (id === DEFAULT_WORD_SET.id) {
+      alert("The default word set cannot be deleted.");
+      return;
+    }
+    
     if (confirm('Are you sure you want to delete this word set?')) {
       setWordSets(prev => {
         const newWordSets = { ...prev };
@@ -202,7 +211,7 @@ function App() {
         if (remainingIds.length > 0) {
           setCurrentWordSetId(remainingIds[0]);
         } else {
-          setCurrentWordSetId('');
+          setCurrentWordSetId(DEFAULT_WORD_SET.id); // Fall back to default set
         }
       }
     }
@@ -226,7 +235,10 @@ function App() {
       
       {/* Conditionally render main container based on view */}
       {currentView === 'practice' && hasWordSets && currentWordSet ? (
-        <SpellingGame words={currentWordSet.words} />
+        <SpellingGame 
+          words={currentWordSet.words} 
+          onGameComplete={() => setCurrentView('learn')}
+        />
       ) : (
         <main className="container mx-auto px-4 py-8">
           {hasWordSets && currentWordSet ? (

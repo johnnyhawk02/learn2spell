@@ -11,9 +11,13 @@ type Word = {
 
 type SpellingGameProps = {
   words: Word[]
+  onGameComplete?: () => void // Add callback for game completion
 }
 
-const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
+const SpellingGame: React.FC<SpellingGameProps> = ({ 
+  words,
+  onGameComplete = () => {} // Default no-op function
+}) => {
   const [currentWordIndex, setCurrentWordIndex] = useState(0)
   const [userInput, setUserInput] = useState('')
   const [gameState, setGameState] = useState<'playing' | 'correct' | 'incorrect'>('playing')
@@ -23,6 +27,8 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
   const [isAnimating, setIsAnimating] = useState(false)
   const [confetti, setConfetti] = useState(false)
   const [nextWordCountdown, setNextWordCountdown] = useState<number | null>(null)
+  const [showToast, setShowToast] = useState(false)
+  const [isWrongToast, setIsWrongToast] = useState(false)
 
   // Reset hints when moving to a new word
   useEffect(() => {
@@ -47,6 +53,7 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
     
     if (nextWordCountdown === 0) {
       setNextWordCountdown(null)
+      moveToNextWord()
     }
   }, [nextWordCountdown])
 
@@ -57,7 +64,14 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
   }
 
   const handleKeyPress = (key: string) => {
-    if (gameState !== 'playing') return
+    if (gameState !== 'playing') {
+      // If an answer was given and a key is pressed, move to next word (for incorrect answers)
+      if (gameState === 'incorrect') {
+        moveToNextWord()
+        return
+      }
+      return
+    }
 
     if (key === 'Backspace') {
       setUserInput(prev => prev.slice(0, -1))
@@ -73,6 +87,49 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
       await pronounceWord(words[currentWordIndex].word)
     }
   }
+  
+  // Function to speak encouraging messages
+  const speakFeedback = async (isCorrect: boolean) => {
+    try {
+      // Reduced delay before speaking feedback
+      await new Promise(resolve => setTimeout(resolve, 200))
+      
+      const currentWord = words[currentWordIndex].word
+      
+      if (isCorrect) {
+        // Shorter positive messages
+        const messages = [
+          `Well done, Chloe!`,
+          `Great job, Chloe!`,
+          `Perfect, Chloe!`,
+          `Excellent, Chloe!`,
+          `That's right, Chloe!`
+        ]
+        const message = messages[Math.floor(Math.random() * messages.length)]
+        // Simply call pronounceWord which will use Alice's voice
+        await pronounceWord(message)
+        
+        // Move to next word after a short delay to hear the feedback
+        setTimeout(() => {
+          moveToNextWord()
+        }, 1500)
+      } else {
+        // Shorter encouraging messages for incorrect answers
+        const messages = [
+          `Try again Chloe, it's ${currentWord}.`,
+          `It's spelled ${currentWord}, Chloe.`,
+          `The word is ${currentWord}, Chloe.`,
+          `Almost, Chloe. It's ${currentWord}.`,
+          `Keep trying, Chloe.`
+        ]
+        const message = messages[Math.floor(Math.random() * messages.length)]
+        // Simply call pronounceWord which will use Alice's voice
+        await pronounceWord(message)
+      }
+    } catch (error) {
+      console.error('Error with voice feedback:', error)
+    }
+  }
 
   const checkAnswer = () => {
     const currentWord = words[currentWordIndex].word.toLowerCase()
@@ -81,36 +138,43 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
     if (isCorrect) {
       playSuccessSound()
       setConfetti(true)
-      setTimeout(() => setConfetti(false), 3000)
       setScore(prev => prev + 1)
       setGameState('correct')
+      setShowToast(true)
+      setIsWrongToast(false)
       
-      // Automatically move to the next word after showing "Correct!" message
+      // Provide voice feedback for correct answer
+      // moveToNextWord call is now handled in speakFeedback for correct answers
+      speakFeedback(true)
+      
+      // Hide confetti after a few seconds
       setTimeout(() => {
-        moveToNextWord()
-      }, 1500) // 1.5 seconds delay before moving to next word
+        setConfetti(false)
+      }, 2000)
     } else {
       playErrorSound()
       setGameState('incorrect')
+      setShowToast(true)
+      setIsWrongToast(true)
       
-      // Start countdown for 2 seconds
-      setNextWordCountdown(2)
+      // Provide voice feedback for incorrect answer
+      speakFeedback(false)
       
-      // Automatically move to the next word after showing the incorrect answer message
+      // Hide toast after 3 seconds - shorter duration
       setTimeout(() => {
-        moveToNextWord()
-      }, 2500) // 2.5 seconds delay before moving to next word when incorrect
+        setShowToast(false)
+      }, 3000)
     }
 
     setIsAnimating(true)
-    setTimeout(() => setIsAnimating(false), 500)
+    setTimeout(() => setIsAnimating(false), 300)
   }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (gameState === 'playing' && userInput.trim()) {
       checkAnswer()
-    } else if (gameState !== 'playing') {
+    } else if (gameState === 'incorrect') {
       moveToNextWord()
     }
   }
@@ -120,10 +184,17 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
       setCurrentWordIndex(prev => prev + 1)
       setUserInput('')
       setGameState('playing')
+      setShowToast(false)
+      setIsWrongToast(false)
       
       // Word will be pronounced by the useEffect that triggers on currentWordIndex change
     } else {
       setGameCompleted(true)
+      // If game is completed and we have a callback function, call it
+      // This will allow the parent to navigate back to the main screen
+      setTimeout(() => {
+        onGameComplete()
+      }, 3000) // Give time to show the completion screen before returning
     }
   }
 
@@ -335,65 +406,45 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
       </div>
       
       {/* Input area - make it sticky and more visible */}
-      <div className="p-3 bg-white bg-opacity-90 shadow-md">
-        <form onSubmit={handleSubmit} className="flex flex-col space-y-2">
-          <div className="relative">
+      <div className="p-2 bg-white bg-opacity-90 shadow-md">
+        <form onSubmit={handleSubmit} className="flex flex-col">
+          <div className="relative flex flex-col items-center">
+            {/* User input display with large centered text and flashing cursor */}
+            <div className="w-full h-20 flex items-center justify-center relative bg-blue-50 rounded-xl overflow-hidden">
+              <div className="text-4xl md:text-5xl font-bold text-blue-700 tracking-wide uppercase">
+                {userInput}
+                <span className={`inline-block w-1 h-[27px] md:h-[35px] bg-blue-500 ml-1 mt-[3px] ${gameState === 'playing' ? 'animate-cursor-blink' : 'opacity-0'}`}></span>
+              </div>
+            </div>
+            
+            {/* Hidden input for mobile keyboard support */}
             <input
               type="text"
               value={userInput}
               onChange={handleInputChange}
-              className={`
-                w-full px-4 py-3 text-xl font-bold rounded-xl border-2
-                ${gameState === 'playing' 
-                  ? 'border-blue-300 focus:border-blue-500 focus:ring-2 focus:ring-blue-200' 
-                  : gameState === 'correct'
-                    ? 'border-green-500 bg-green-50'
-                    : 'border-red-500 bg-red-50'
-                }
-                focus:outline-none transition-colors
-                shadow-inner
-              `}
-              placeholder="Type your answer..."
-              readOnly={gameState !== 'playing'}
+              className="sr-only"
               autoComplete="off"
               spellCheck="false"
               autoCapitalize="off"
             />
-            
-            {/* Animated bounce indicator when typing */}
-            <div 
-              className={`
-                absolute top-1/2 right-3 transform -translate-y-1/2
-                w-3 h-3 rounded-full
-                ${userInput.length > 0 && gameState === 'playing' ? 'bg-blue-500 animate-ping' : 'hidden'}
-              `}
-            ></div>
           </div>
           
-          {/* Feedback message area with fixed height to prevent layout shifts */}
-          <div className="h-12 flex items-center justify-center">
-            {gameState !== 'playing' ? (
-              <div className={`
-                w-full text-center text-lg font-bold rounded-lg p-2
-                ${gameState === 'correct' ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'}
-                animate-pop
-              `}>
-                {gameState === 'correct' 
-                  ? '🎉 Correct! Great job!' 
-                  : (
-                    <div className="flex items-center justify-center">
-                      <span>💫 Not quite. The word is "{currentWord.word}"</span>
-                      {nextWordCountdown !== null && (
-                        <span className="ml-2 px-2 py-0.5 bg-white rounded-full text-sm">
-                          Next word in {nextWordCountdown}...
-                        </span>
-                      )}
-                    </div>
-                  )
-                }
-              </div>
-            ) : null}
-          </div>
+          {/* Toast notification for correct/incorrect answers */}
+          {showToast && (
+            <div className="absolute left-0 right-0 top-1/3 flex justify-center items-center z-50 pointer-events-none">
+              {!isWrongToast ? (
+                <div className="animate-float-in-up bg-green-500 text-white px-6 py-4 rounded-xl shadow-lg border-2 border-green-400">
+                  <div className="text-2xl font-bold text-center">🎉 CORRECT! 🎉</div>
+                  <div className="text-center text-sm">Press any key</div>
+                </div>
+              ) : (
+                <div className="animate-float-in-up bg-red-500 text-white px-6 py-4 rounded-xl shadow-lg border-2 border-red-400">
+                  <div className="text-2xl font-bold text-center">TRY AGAIN</div>
+                  <div className="text-center text-sm">The word is <span className="font-bold uppercase">{currentWord.word}</span></div>
+                </div>
+              )}
+            </div>
+          )}
         </form>
       </div>
       
@@ -401,7 +452,7 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
       <div className="flex-1 p-1">
         <AlphaKeyboard 
           onKeyPress={handleKeyPress} 
-          disabled={gameState !== 'playing'} 
+          disabled={gameState !== 'playing' && !(gameState === 'correct' || gameState === 'incorrect')} 
         />
       </div>
       
@@ -417,6 +468,20 @@ const SpellingGame: React.FC<SpellingGameProps> = ({ words }) => {
           }
           .animate-pop {
             animation: pop 0.3s ease-out forwards;
+          }
+          @keyframes blink {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+          }
+          .animate-cursor-blink {
+            animation: blink 1s step-end infinite;
+          }
+          @keyframes float-in-up {
+            0% { transform: translateY(20px); opacity: 0; }
+            100% { transform: translateY(0); opacity: 1; }
+          }
+          .animate-float-in-up {
+            animation: float-in-up 0.5s ease-out forwards;
           }
         `}
       </style>

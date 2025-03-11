@@ -17,49 +17,10 @@ const WordList: React.FC<WordListProps> = ({ words }) => {
   // The component no longer needs to manage expansion state
   // or example sentences/tips as those are not part of the simplified cards
 
-  // Function to highlight the letter 'y' in words
+  // Function that no longer highlights any letters
   const highlightPatternInWord = (word: string) => {
-    // Simple highlighting of the letter 'y'
-    const lowerWord = word.toLowerCase();
-    const parts = [];
-    let lastIndex = 0;
-    
-    // Find all instances of 'y' and highlight them
-    for (let i = 0; i < lowerWord.length; i++) {
-      if (lowerWord[i] === 'y') {
-        // Add text before the 'y'
-        if (i > lastIndex) {
-          parts.push(
-            <span key={`${word}-${i}-before`}>
-              {word.substring(lastIndex, i)}
-            </span>
-          );
-        }
-        
-        // Add the highlighted 'y'
-        parts.push(
-          <span 
-            key={`${word}-${i}-highlight`}
-            className="bg-yellow-200 font-bold px-0.5 rounded"
-          >
-            {word[i]}
-          </span>
-        );
-        
-        lastIndex = i + 1;
-      }
-    }
-    
-    // Add any remaining text
-    if (lastIndex < word.length) {
-      parts.push(
-        <span key={`${word}-end`}>
-          {word.substring(lastIndex)}
-        </span>
-      );
-    }
-    
-    return parts.length > 0 ? parts : word;
+    // Return the word as is without highlighting
+    return word;
   };
 
   return (

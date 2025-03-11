@@ -22,6 +22,14 @@ type HeaderProps = {
   onDeleteWordSet: (id: string) => void
 }
 
+// Helper function to truncate titles consistently
+const truncateTitle = (title: string, maxLength: number = 20): string => {
+  if (title.length > maxLength) {
+    return title.substring(0, maxLength) + '...';
+  }
+  return title;
+};
+
 const Header: React.FC<HeaderProps> = ({ 
   currentView, 
   onViewChange, 
@@ -39,6 +47,8 @@ const Header: React.FC<HeaderProps> = ({
 
   const handleWordSetChange = (id: string) => {
     onWordSetChange(id);
+    // Always switch to learn view when selecting a new word set
+    onViewChange('learn');
     setIsMenuOpen(false);
   };
 
@@ -47,7 +57,7 @@ const Header: React.FC<HeaderProps> = ({
   const hasWordSets = wordSets.length > 0;
 
   return (
-    <header className="bg-white shadow-md">
+    <header className="bg-white shadow-md relative z-30">
       <div className="container mx-auto px-4 py-4">
         <div className="flex flex-col sm:flex-row items-center justify-between">
           <div className="mb-4 sm:mb-0">
@@ -65,9 +75,7 @@ const Header: React.FC<HeaderProps> = ({
                   <span>Word Set: </span>
                   <span className="font-medium">
                     {currentWordSet && currentWordSet.title ? 
-                      (currentWordSet.title.length > 20 
-                        ? currentWordSet.title.substring(0, 20) + '...' 
-                        : currentWordSet.title)
+                      truncateTitle(currentWordSet.title)
                       : 'Select a set'
                     }
                   </span>
@@ -84,56 +92,81 @@ const Header: React.FC<HeaderProps> = ({
                 
                 {/* Word set dropdown menu */}
                 {isMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-60 bg-white border border-gray-200 rounded-lg shadow-xl z-10">
-                    <ul className="py-2 max-h-72 overflow-y-auto">
-                      {wordSets.map((set) => (
-                        <li key={set.id} className="px-2">
-                          <div className="flex items-center justify-between hover:bg-purple-50 rounded">
-                            <button
-                              onClick={() => handleWordSetChange(set.id)}
-                              className={`flex-grow text-left px-3 py-2 ${
-                                set.id === currentWordSetId ? 'font-medium text-purple-700 bg-purple-50 rounded-md' : ''
-                              }`}
-                            >
-                              {set.title}
-                            </button>
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                onDeleteWordSet(set.id);
-                              }}
-                              className="p-1 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-full"
-                              title="Delete Word Set"
-                            >
-                              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
-                              </svg>
-                            </button>
-                          </div>
-                        </li>
-                      ))}
-                      <li className="border-t border-gray-200 mt-1 pt-1">
-                        <button
-                          onClick={() => {
-                            setIsMenuOpen(false);
-                            onAddNewClick();
-                          }}
-                          className="w-full text-left px-4 py-2 text-green-600 hover:bg-green-50 font-medium flex items-center"
-                        >
-                          <svg 
-                            xmlns="http://www.w3.org/2000/svg" 
-                            className="h-4 w-4 mr-2" 
-                            fill="none" 
-                            viewBox="0 0 24 24" 
-                            stroke="currentColor"
+                  <>
+                    {/* Backdrop to close menu when clicking outside */}
+                    <div 
+                      className="fixed inset-0 bg-transparent z-40" 
+                      onClick={() => setIsMenuOpen(false)}
+                    ></div>
+                    
+                    {/* Dropdown content */}
+                    <div className="absolute right-0 mt-2 w-64 bg-white border border-gray-200 rounded-lg shadow-2xl z-50">
+                      <ul className="py-2 max-h-72 overflow-y-auto">
+                        {wordSets.map((set) => (
+                          <li key={set.id} className="px-2">
+                            <div className="flex items-center justify-between hover:bg-purple-50 rounded">
+                              <button
+                                onClick={() => handleWordSetChange(set.id)}
+                                className={`flex-grow text-left px-3 py-2 ${
+                                  set.id === currentWordSetId ? 'font-medium text-purple-700 bg-purple-50 rounded-md' : ''
+                                }`}
+                              >
+                                <div className="flex items-center">
+                                  {truncateTitle(set.title)}
+                                  {set.id === "default-wordset-id" && (
+                                    <span className="ml-2 px-1.5 py-0.5 bg-blue-100 text-blue-800 text-xs rounded">
+                                      Default
+                                    </span>
+                                  )}
+                                </div>
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  // Don't allow deletion of default set
+                                  if (set.id === "default-wordset-id") {
+                                    alert("The default word set cannot be deleted.");
+                                  } else {
+                                    onDeleteWordSet(set.id);
+                                  }
+                                }}
+                                className={`p-1 ${
+                                  set.id === "default-wordset-id" 
+                                    ? "text-gray-400 cursor-not-allowed" 
+                                    : "text-red-500 hover:text-red-700 hover:bg-red-50"
+                                } rounded-full`}
+                                title={set.id === "default-wordset-id" ? "Default set cannot be deleted" : "Delete Word Set"}
+                              >
+                                <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                </svg>
+                              </button>
+                            </div>
+                          </li>
+                        ))}
+                        <li className="border-t border-gray-200 mt-1 pt-1">
+                          <button
+                            onClick={() => {
+                              setIsMenuOpen(false);
+                              onAddNewClick();
+                            }}
+                            className="w-full text-left px-4 py-2 text-green-600 hover:bg-green-50 font-medium flex items-center"
                           >
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                          </svg>
-                          Add New Word Set
-                        </button>
-                      </li>
-                    </ul>
-                  </div>
+                            <svg 
+                              xmlns="http://www.w3.org/2000/svg" 
+                              className="h-4 w-4 mr-2" 
+                              fill="none" 
+                              viewBox="0 0 24 24" 
+                              stroke="currentColor"
+                            >
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                            </svg>
+                            Add New Word Set
+                          </button>
+                        </li>
+                      </ul>
+                    </div>
+                  </>
                 )}
               </div>
             )}

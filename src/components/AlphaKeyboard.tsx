@@ -13,16 +13,8 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
     ['z', 'x', 'c', 'v', 'b', 'n', 'm']
   ]
   
-  // Fun colors for letter keys - kids love colors!
-  const keyColors = [
-    'bg-blue-100 border-blue-400 text-blue-800 hover:bg-blue-200 active:bg-blue-300', 
-    'bg-purple-100 border-purple-400 text-purple-800 hover:bg-purple-200 active:bg-purple-300',
-    'bg-pink-100 border-pink-400 text-pink-800 hover:bg-pink-200 active:bg-pink-300',
-    'bg-green-100 border-green-400 text-green-800 hover:bg-green-200 active:bg-green-300',
-    'bg-yellow-100 border-yellow-400 text-yellow-800 hover:bg-yellow-200 active:bg-yellow-300',
-    'bg-red-100 border-red-400 text-red-800 hover:bg-red-200 active:bg-red-300',
-    'bg-indigo-100 border-indigo-400 text-indigo-800 hover:bg-indigo-200 active:bg-indigo-300',
-  ]
+  // Single color scheme for all letter keys
+  const keyColor = 'bg-blue-100 border-blue-400 text-blue-800 hover:bg-blue-200 active:bg-blue-300'
 
   // Create audio context for click sound
   const playClickSound = useCallback(() => {
@@ -58,13 +50,6 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
       onKeyPress(key);
     }
   }
-  
-  // Function to get random color from keyColors array
-  const getRandomColor = (letter: string) => {
-    // Use character code as seed for consistent colors per letter
-    const index = letter.charCodeAt(0) % keyColors.length;
-    return keyColors[index];
-  }
 
   return (
     <div className="w-full h-full flex flex-col justify-between select-none bg-gray-100 rounded-lg p-2">
@@ -80,13 +65,13 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
               onClick={() => handleKeyPress(key)}
               disabled={disabled}
               className={`
-                flex-1 aspect-square max-w-[8%] m-[0.3%] rounded-xl text-xl font-bold
+                flex-1 aspect-square max-w-[8%] m-[0.3%] rounded-xl text-2xl font-bold
                 flex items-center justify-center
                 focus:outline-none 
                 transition-all duration-150 
                 ${disabled
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-inner'
-                  : `${getRandomColor(key)} border-2 active:transform active:scale-95 shadow-md`
+                  : `${keyColor} border-2 active:transform active:scale-95 shadow-md`
                 }
                 uppercase
               `}
@@ -118,7 +103,7 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
           </button>
         </div>
         
-        {/* Second row with offset */}
+        {/* Second row with offset and CHECK IT! button */}
         <div className="flex justify-center ml-[2%]">
           {keyboardRows[1].map(key => (
             <button
@@ -127,39 +112,13 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
               onClick={() => handleKeyPress(key)}
               disabled={disabled}
               className={`
-                flex-1 aspect-square max-w-[8%] m-[0.3%] rounded-xl text-xl font-bold
+                flex-1 aspect-square max-w-[8%] m-[0.3%] rounded-xl text-2xl font-bold
                 flex items-center justify-center
                 focus:outline-none 
                 transition-all duration-150 
                 ${disabled
                   ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-inner'
-                  : `${getRandomColor(key)} border-2 active:transform active:scale-95 shadow-md`
-                }
-                uppercase
-              `}
-              aria-label={key}
-            >
-              {key}
-            </button>
-          ))}
-        </div>
-        
-        {/* Third row with offset and CHECK IT! button */}
-        <div className="flex justify-center ml-[5%]">
-          {keyboardRows[2].map(key => (
-            <button
-              key={key}
-              type="button"
-              onClick={() => handleKeyPress(key)}
-              disabled={disabled}
-              className={`
-                flex-1 aspect-square max-w-[8%] m-[0.3%] rounded-xl text-xl font-bold
-                flex items-center justify-center
-                focus:outline-none 
-                transition-all duration-150 
-                ${disabled
-                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-inner'
-                  : `${getRandomColor(key)} border-2 active:transform active:scale-95 shadow-md`
+                  : `${keyColor} border-2 active:transform active:scale-95 shadow-md`
                 }
                 uppercase
               `}
@@ -169,7 +128,7 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
             </button>
           ))}
           
-          {/* CHECK IT! button integrated at the end of last row */}
+          {/* CHECK IT! button integrated at the end of second row */}
           <button
             type="button"
             onClick={() => handleKeyPress('Enter')}
@@ -198,6 +157,32 @@ const AlphaKeyboard: React.FC<AlphaKeyboardProps> = ({ onKeyPress, disabled = fa
             </svg>
             <span className="text-xs">CHECK</span>
           </button>
+        </div>
+        
+        {/* Third row with offset */}
+        <div className="flex justify-center ml-[5%]">
+          {keyboardRows[2].map(key => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => handleKeyPress(key)}
+              disabled={disabled}
+              className={`
+                flex-1 aspect-square max-w-[8%] m-[0.3%] rounded-xl text-2xl font-bold
+                flex items-center justify-center
+                focus:outline-none 
+                transition-all duration-150 
+                ${disabled
+                  ? 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-inner'
+                  : `${keyColor} border-2 active:transform active:scale-95 shadow-md`
+                }
+                uppercase
+              `}
+              aria-label={key}
+            >
+              {key}
+            </button>
+          ))}
         </div>
       </div>
     </div>

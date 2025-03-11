@@ -7,14 +7,14 @@ const hasValidApiKey = () => {
 };
 
 // Alice's voice ID - the ONLY voice we'll use
-const ALICE_VOICE_ID = "Xb7hH8MSUJpSbSDYk0k2";
+const ALICE_VOICE_ID = import.meta.env.VITE_ALICE_VOICE_ID || "Xb7hH8MSUJpSbSDYk0k2";
 
 // Voice settings configuration - ONLY normal speed
 const VOICE_SETTINGS = {
   normal: {
-    stability: 0.75,
-    similarity_boost: 0.75,
-    style: 0,
+    stability: 0.80,      // Slightly increased for more consistency
+    similarity_boost: 0.7, // Slightly reduced for more natural sound
+    style: 0.5,           // Add some style variation for better pronunciation
     use_speaker_boost: true
   }
 };
@@ -39,6 +39,17 @@ export type ElevenLabsVoice = {
 
 export type GetVoicesResponse = {
   voices: ElevenLabsVoice[];
+}
+
+/**
+ * Format text to ensure consistent pronunciation
+ * 
+ * @param word The word to format
+ * @returns Formatted text that will be pronounced consistently
+ */
+function formatForConsistentPronunciation(word: string): string {
+  // Add quotation marks and period for consistent intonation pattern
+  return `"${word}".`;
 }
 
 /**
@@ -86,8 +97,11 @@ export async function generateSpeech(word: string): Promise<string> {
       throw new Error("No ElevenLabs API key provided. Set VITE_ELEVENLABS_API_KEY in your .env file.");
     }
     
+    // Format the word for consistent pronunciation
+    const formattedWord = formatForConsistentPronunciation(word);
+    
     // Check if we already have this word in cache
-    const cacheKey = `${word}-${ALICE_VOICE_ID}-normal`;
+    const cacheKey = `${formattedWord}-${ALICE_VOICE_ID}-normal`;
     if (audioCache.has(cacheKey)) {
       return audioCache.get(cacheKey)!;
     }
@@ -103,7 +117,7 @@ export async function generateSpeech(word: string): Promise<string> {
         'xi-api-key': API_KEY
       },
       body: JSON.stringify({
-        text: word,
+        text: formattedWord,
         model_id: 'eleven_monolingual_v1',
         voice_settings: VOICE_SETTINGS.normal
       })
@@ -170,7 +184,7 @@ export async function pronouncePhoneticBreakdown(phoneticBreakdown: string): Pro
       .replace(/\s+/g, '. '); // Replace spaces with period and space
     
     // Add more deliberate pauses between sounds
-    formattedBreakdown = formattedBreakdown + '.';
+    formattedBreakdown = `"${formattedBreakdown}".`;
     
     // Use Alice's voice at normal speed with the formatted text
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${ALICE_VOICE_ID}`;
@@ -230,6 +244,9 @@ export async function pronounceLetterByLetter(word: string): Promise<void> {
     // Add space and pause after each letter
     const simpleSpellOut = letters.join(' . ');
     
+    // Format for consistent pronunciation
+    const formattedSpellOut = `"${simpleSpellOut}".`;
+    
     // Use Alice's voice at normal speed with the formatted text
     const url = `https://api.elevenlabs.io/v1/text-to-speech/${ALICE_VOICE_ID}`;
     
@@ -241,7 +258,7 @@ export async function pronounceLetterByLetter(word: string): Promise<void> {
         'xi-api-key': API_KEY
       },
       body: JSON.stringify({
-        text: simpleSpellOut,
+        text: formattedSpellOut,
         model_id: 'eleven_monolingual_v1',
         voice_settings: VOICE_SETTINGS.normal
       })
